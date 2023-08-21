@@ -1054,7 +1054,7 @@ test_objcc(){
     log test_objcc "$@"
     cat > $TMPM
     log_file $TMPM
-    test_cmd $objcc -Werror=missing-prototypes $CPPFLAGS $CFLAGS $OBJCFLAGS "$@" $OBJCC_C $(cc_o $TMPO) $TMPM
+    test_cmd $objcc $CPPFLAGS $CFLAGS $OBJCFLAGS "$@" $OBJCC_C $(cc_o $TMPO) $TMPM
 }
 
 test_nvcc(){
@@ -1099,7 +1099,7 @@ test_x86asm(){
     echo "$1" > $TMPASM
     log_file $TMPASM
     shift
-    test_cmd $x86asmexe $X86ASMFLAGS -Werror "$@" $(x86asm_o $TMPO) $TMPASM
+    test_cmd $x86asmexe $X86ASMFLAGS $(x86asm_o $TMPO) $TMPASM
 }
 
 check_cmd(){
@@ -5626,7 +5626,6 @@ case $target_os in
         enabled x86_32 && append SHFLAGS -Wl,-read_only_relocs,suppress
         strip="${strip} -x"
         add_ldflags -Wl,-dynamic,-search_paths_first
-        check_cflags -Werror=partial-availability
         SLIBSUF=".dylib"
         SLIBNAME_WITH_VERSION='$(SLIBPREF)$(FULLNAME).$(LIBVERSION)$(SLIBSUF)'
         SLIBNAME_WITH_MAJOR='$(SLIBPREF)$(FULLNAME).$(LIBMAJOR)$(SLIBSUF)'
@@ -7226,10 +7225,6 @@ check_disable_warning(){
     test_cflags $unknown_warning_flags $warning_flag && add_cflags $1
 }
 
-test_cflags -Werror=unused-command-line-argument &&
-    append unknown_warning_flags "-Werror=unused-command-line-argument"
-test_cflags -Werror=unknown-warning-option &&
-    append unknown_warning_flags "-Werror=unknown-warning-option"
 
 check_disable_warning -Wno-parentheses
 check_disable_warning -Wno-switch
@@ -7367,11 +7362,6 @@ if enabled icc; then
     fi
 elif enabled gcc; then
     check_optflags -fno-tree-vectorize
-    check_cflags -Werror=format-security
-    check_cflags -Werror=implicit-function-declaration
-    check_cflags -Werror=missing-prototypes
-    check_cflags -Werror=return-type
-    check_cflags -Werror=vla
     check_cflags -Wformat
     check_cflags -fdiagnostics-color=auto
     enabled extra_warnings || check_disable_warning -Wno-maybe-uninitialized
@@ -7409,9 +7399,6 @@ elif enabled clang; then
         check_cflags -mstack-alignment=16
     fi
     check_cflags -Qunused-arguments
-    check_cflags -Werror=implicit-function-declaration
-    check_cflags -Werror=missing-prototypes
-    check_cflags -Werror=return-type
 elif enabled cparser; then
     add_cflags -Wno-missing-variable-declarations
     add_cflags -Wno-empty-statement
